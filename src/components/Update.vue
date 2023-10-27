@@ -7,7 +7,7 @@
           <div class="custom-card-header d-flex justify-content-between">
             <h5 class="card-title">Expense Details</h5>
             <router-link to="/Mysplits" class="border-0 rounded-pill text-dark">
-              <i class="bi bi-arrow-left-circle-fill"></i>
+              <i class="bi bi-arrow-left-circle-fill text-white"></i>
             </router-link>
           </div>
           <div class="custom-card-body" v-if="expense">
@@ -25,7 +25,9 @@
                 <label for="payerUserId" class="form-label">Payer</label>
                 <select id="payerUserId" class="form-select" v-model="expense.payerUserId">
                   <option value="" disabled>Select a payer</option>
-                  <option v-for="email in suggestedEmails" :key="email" :value="email">{{ email }}</option>
+                  <option v-for="email in suggestedEmails" :key="email" :value="email">
+                    {{ email }}
+                  </option>
                 </select>
               </div>
               <div class="mb-3">
@@ -58,39 +60,46 @@
             </button>
           </div>
           <div class="custom-card-body">
-            <div v-for="(participant, index) in expense.participants" :key="index">
-              <div class="mb-3 d-flex justify-content-between align-items-center">
-                <label :for="`participantName${index}`" class="form-label me-2">Name:</label>
-                <div class="input-group">
-                  <select
-                    :id="`participantName${index}`"
-                    class="form-select"
-                    v-model="participant.userId"
-                  >
-                    <option value="" disabled>Select a payer</option>
-                    <option v-for="email in suggestedEmails" :key="email" :value="email">{{ email }}</option>
-                  </select>
-                </div>
-                <label :for="`participantShare${index}`" class="form-label ms-4 me-2">Share:</label>
-                <div class="input-group">
-                  <input
-                    :id="`participantShare${index}`"
-                    class="form-control"
-                    v-model="participant.share"
-                  />
-                  <button @click="removeParticipant(index)" class="cancel-icon">
-                    <i class="bi bi-x text-danger"></i>
-                  </button>
-                </div>
-              </div>
+            <div class="custom-card-body">
+              <table class="table table-dark table-borderless">
+                <thead class="table table-dark table-borderless">
+                  <tr>
+                    <th>Name</th>
+                    <th>Share</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(participant, index) in expense.participants" :key="index">
+                    <td>
+                      <div class="input-group">
+                        <select class="form-select custom-select" v-model="participant.userId">
+                          <option value="" disabled>Select a payer</option>
+                          <option v-for="email in suggestedEmails" :key="email" :value="email">
+                            {{ email }}
+                          </option>
+                        </select>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="input-group">
+                        <input class="form-control custom-input" v-model="participant.share" />
+                      </div>
+                    </td>
+                    <td>
+                      <button @click="removeParticipant(index)" class="btn btn-danger custom-btn">
+                        <i class="bi bi-x"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
             <div class="d-flex justify-content-center mt-4">
-              <button class="btn btn-secondary me-3 ps-4 pe-4 rounded-pill" @click="updateExpense"
-                :disabled="!isFormValid"
-              >
+              <button class="btn btn-secondary me-3 ps-4 pe-4 rounded-pill" @click="updateExpense">
                 <i class="bi bi-pencil-fill"></i> Update Expense
               </button>
-              <button class="btn btn-danger ps-4 pe-4 rounded-pill" @click="cancelExpense">
+              <button class="cancle-icon ps-4 pe-4 rounded-pill" @click="cancelExpense">
                 <i class="bi bi-x-square-fill"></i> Cancel
               </button>
             </div>
@@ -208,7 +217,8 @@ onMounted(() => {
 }
 
 .custom-card-header {
-  background: linear-gradient(90deg, #040e18, #9bafe6);
+  background: linear-gradient(90deg, #160024, rgb(78, 1, 114), #1c0129);
+
   color: white;
   padding: 10px;
   border-top-left-radius: 10px;
@@ -219,7 +229,13 @@ onMounted(() => {
   background-color: white;
   border: 1px solid #ccc;
   border-radius: 5px;
-  color: red;
+  color: rgb(174, 0, 255);
+}
+.cancle-icon {
+  background-color: rgb(87, 1, 99);
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  color: rgb(250, 250, 250);
 }
 
 .add-button {
@@ -241,5 +257,26 @@ onMounted(() => {
 
 .text-danger {
   color: red;
+}
+
+.custom-select {
+  background-color: #dddddd; /* Light gray background */
+  font-weight: bold;
+}
+
+.custom-input {
+  background-color: #dddddd; /* Slightly darker gray background */
+}
+
+.custom-btn {
+  background-color: #e40303; /* Red background */
+  color: rgb(255, 255, 255);
+  border: none;
+  /* padding: 8px 12px; */
+  transition: background-color 0.3s;
+}
+
+.custom-btn:hover {
+  background-color: #c82333; /* Darker red on hover */
 }
 </style>

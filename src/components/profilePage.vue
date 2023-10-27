@@ -31,7 +31,7 @@ const { user, isAuthenticated } = useAuth0();
   padding: 20px;
   border: none;
   border-radius: 10px;
-  background: linear-gradient(90deg, #040e18, #1d326d);
+  background: linear-gradient(90deg, #160024, rgb(78, 1, 114), #1c0129);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
   color: #fff;
   transition: transform 0.2s;

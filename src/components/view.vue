@@ -7,7 +7,7 @@
           <div class="card-header d-flex justify-content-between custom-card-header text-white">
             <h5 class="card-title">{{ expense.description }}</h5>
             <router-link to="/Mysplits" class="text-dark rounded-pill">
-              <i class="bi bi-arrow-left-circle-fill"></i>
+              <i class="bi bi-arrow-left-circle-fill text-white"></i>
             </router-link>
           </div>
           <div class="card-body">
@@ -135,7 +135,8 @@ onMounted(() => {
 }
 
 .custom-card-header {
-  background: linear-gradient(90deg, #040e18, #9bafe6);
+  background: linear-gradient(90deg, #160024, rgb(78, 1, 114), #1c0129);
+
   color: white;
   padding: 10px;
   align-items: center;
@@ -180,7 +181,7 @@ onMounted(() => {
 }
 
 .participant-item {
-  background: linear-gradient(90deg, #dfe3e7, #c7cad4);
+  background: linear-gradient(90deg, #ddcffd, #cec7d4);
   margin: 10px;
   text-align: center;
 }
@@ -193,7 +194,7 @@ onMounted(() => {
 }
 
 .user-id {
-  background-color: #274975;
+  background-color: #5c2775;
   color: rgb(255, 255, 255);
   border-radius: 5px;
   padding: 5px 10px;

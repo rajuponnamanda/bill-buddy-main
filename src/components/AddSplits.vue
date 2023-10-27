@@ -1,15 +1,15 @@
 <template>
   <div class="container mt-4">
+    <div v-if="isModalVisible"></div>
     <h1 class="mb-4 text-center">Add Expense</h1>
     <div class="row">
-      <!-- <div class="col-3"></div> -->
       <div class="col-md-12 add-card">
         <div class="custom-card mb-4">
           <div class="custom-card-header d-flex justify-content-between">
             <h5 class="card-title">Expense Details</h5>
-            <router-link to="/Mysplits" class="border-0 rounded-pill text-dark"
-              ><i class="bi bi-arrow-left-circle-fill"></i
-            ></router-link>
+            <router-link to="/Mysplits" class="border-0 rounded-pill text-dark">
+              <i class="bi bi-arrow-left-circle-fill"></i>
+            </router-link>
           </div>
           <div class="custom-card-body">
             <div class="mb-3">
@@ -78,38 +78,38 @@
               </div>
             </div>
             <div class="col-4 mx-auto d-flex justify-content-center">
-              <!-- Conditionally render the "Save Expense" button -->
               <button
                 class="btn btn-secondary text-dark me-3 ps-4 pe-4 rounded-pill"
                 @click="saveExpense"
                 v-if="formData.description && formData.payerUserId && formData.amount > 0"
               >
-                <i class="bi bi-floppy-fill"></i>
-                Save 
+                <i class="bi bi-floppy-fill"></i> Save
               </button>
               <button
                 class="btn btn-danger text-dark ps-4 pe-4 rounded-pill"
                 @click="cancelExpense"
               >
-                <i class="bi bi-x-square-fill"></i>
-                Cancel 
+                <i class="bi bi-x-square-fill"></i> Cancel
               </button>
             </div>
           </div>
         </div>
       </div>
+      <div v-if="isModalVisible" class="modal-overlay ">
+        <div class="modal pt-5">
+          <i class="bi bi-exclamation-triangle-fill text-warning warning-icon"></i>
+          <p class="text-dark">Your  total share is Greater than total amount which is not valid </p>
+          <button @click="closeModal">OK</button>
+        </div>
+      </div>
     </div>
-    <div class="d-grid gap-2 col-2 mx-auto"></div>
   </div>
 </template>
-
-
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import axiosInstance from '../services/service'
 import router from '../router'
-
 const formData = ref({
   payerUserId: '',
   description: '',
@@ -130,6 +130,8 @@ type Participant = {
   share: number
 }
 
+const isModalVisible = ref(false)
+
 const suggestedEmails = ref([])
 const selectedEmail = ref('You')
 const selectedPeopleToAdd = ref([])
@@ -144,22 +146,25 @@ const getSuggestedEmails = async () => {
   }
 }
 
+const closeModal = () => {
+  isModalVisible.value = false
+}
 
 const cancelExpense = () => {
   // Clear the form data
-  formData.value.description = '';
-  formData.value.amount = 0;
-  formData.value.payerUserId = '';
-  formData.value.isArchived = false;
-  formData.value.date = '';
+  formData.value.description = ''
+  formData.value.amount = 0
+  formData.value.payerUserId = ''
+  formData.value.isArchived = false
+  formData.value.date = ''
   formData.value.participants = [
     {
       userId: '',
-      share: 0,
-    },
-  ];
-  selectedPeople.value = [];
-};
+      share: 0
+    }
+  ]
+  selectedPeople.value = []
+}
 
 const addSelectedPeople = () => {
   selectedPeople.value = [...selectedPeople.value, ...selectedPeopleToAdd.value]
@@ -178,8 +183,6 @@ const removeParticipant = (index: number) => {
 }
 
 const saveExpense = async () => {
-  console.log('hfdhfhf', formData)
-
   try {
     const postData = {
       description: formData.value.description,
@@ -189,20 +192,40 @@ const saveExpense = async () => {
       isArchived: formData.value.isArchived,
       date: formData.value.date
     }
-    const response = await axiosInstance.post('/addTransaction', postData)
 
-    console.log('Response:', response.data)
+    let totalShare = 0
 
-    formData.value.description = ''
-    formData.value.amount = 0
-    selectedEmail.value = ''
-    formData.value.isArchived = false
-    selectedPeople.value = []
-    formData.value.date = ''
+    // Calculate the total share
+    postData.participants.forEach((participant) => {
+      totalShare += participant.share // No need to parse it
+    })
+
+    if (totalShare === postData.amount || totalShare < postData.amount) {
+      const response = await axiosInstance.post('/addTransaction', postData)
+      console.log('Response:', response.data)
+      clearFormData() // Clear the form data after successful submission
+      router.push('/Mysplits')
+    } else {
+      isModalVisible.value = true
+      console.log('sdsss')
+    }
   } catch (error) {
     console.error('Error:', error)
   }
-  router.push('/Mysplits')
+}
+
+const clearFormData = () => {
+  formData.value.description = ''
+  formData.value.amount = 0
+  formData.value.payerUserId = ''
+  formData.value.isArchived = false
+  formData.value.date = ''
+  formData.value.participants = [
+    {
+      userId: '',
+      share: 0
+    }
+  ]
 }
 
 onMounted(() => {
@@ -219,7 +242,7 @@ onMounted(() => {
 }
 
 .custom-card-header {
-  background: linear-gradient(90deg, #040e18, #9bafe6);
+  background: linear-gradient(90deg, #160024, rgb(78, 1, 114), #1c0129);
   color: white;
   padding: 10px;
   border-top-left-radius: 10px;
@@ -253,7 +276,68 @@ onMounted(() => {
   margin-top: 1rem;
 }
 
+.warning-icon{
+  font-size: 50px;
+  
+}
 .text-danger {
   color: red;
 }
+
+/* Modal Overlay */
+/* Modal Overlay */
+/* Modal Overlay */
+.modal-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  z-index: 999; /* Ensure it's above other content */
+}
+
+/* Modal */
+.modal {
+  width: 30%; /* Set a fixed width */
+  height: auto; /* Set a fixed height */
+  background: #fffdfd;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  padding: 20px;
+  text-align: center;
+  display: inline-block; /* Center horizontally */
+  vertical-align: middle; /* Center vertically */
+  margin-left: 40%;
+}
+
+
+
+/* Modal Text */
+.modal p {
+  font-size: 16px;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+/* OK Button */
+.modal button {
+  background: #007BFF; /* Blue color */
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* OK Button Hover Effect */
+.modal button:hover {
+  background: #0056b3; /* Darker blue on hover */
+}
+
+
 </style>
