@@ -59,7 +59,8 @@
                 <div class="custom-card-header d-flex justify-content-between">
                   <h5 class="card-title text-truncate">{{ expense.description }}</h5>
                   <i
-                    class="bi bi-trash-fill text-danger"
+                    v-if="expense.payerUserId === user?.email"
+                    class="bi bi-trash-fill text-white"
                     @click="userDelete(expense._id, 'expenses')"
                     data-toggle="tooltip"
                     title="Delete"
@@ -88,6 +89,7 @@
 
                       <div class="mt-0 mb-3 col-6">
                         <i
+                          v-if="expense.payerUserId === user?.email"
                           class="bi icons bi-archive"
                           data-toggle="tooltip"
                           title="Archive"
@@ -166,7 +168,8 @@
                   <div class="custom-card-header d-flex justify-content-between">
                     <h5 class="card-title text-truncate">{{ expense.description }}</h5>
                     <i
-                      class="bi bi-trash-fill text-danger"
+                      v-if="expense.payerUserId === user?.email"
+                      class="bi bi-trash-fill text-white"
                       @click="userDelete(expense._id, 'Archivedexpenses')"
                     ></i>
                   </div>
@@ -270,22 +273,6 @@ const isArchived = (expense: { isArchived: boolean }) => {
   return computed(() => expense.isArchived === true)
 }
 
-
-const calculateShares = (expense: { amount: any; participants: any[] }) => {
-  const totalExpense = expense.amount;
-  const selectedParticipants = expense.participants.filter(participant => participant.selected);
-  const totalSelectedShares = selectedParticipants.reduce((sum, participant) => sum + participant.share, 0);
-
-  if (totalSelectedShares !== totalExpense) {
-    // Handle error: Shares do not add up to the total expense.
-    alert('Shares do not add up to the total expense.');
-    return;
-  }
-
-  // Update the expense with the split information
-  expense.participants = selectedParticipants;
-}
-
 const getPayerUsername = (userId: string) => {
   const nameMatch = userId.match(/[A-Za-z\s]+/)
   if (nameMatch && nameMatch.length > 0) {
@@ -295,7 +282,7 @@ const getPayerUsername = (userId: string) => {
       .split(' ')
       .map((word, index) => {
         if (index === 0) {
-          return word.toLowerCase() 
+          return word.toLowerCase()
         }
         return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
       })
@@ -303,7 +290,7 @@ const getPayerUsername = (userId: string) => {
 
     return camelCaseName
   }
-  return userId 
+  return userId
 }
 
 const fetchData = async () => {
@@ -349,7 +336,7 @@ const userDelete = async (id: any, arrayName: string) => {
   try {
     const response = await axiosInstance.delete(`/transactions/${id}`)
     // console.log(response.data)
-    alert ('Are you sure to delete')
+    alert('Are you sure to delete')
     if (arrayName === 'expenses') {
       expenses.value = expenses.value.filter((expense) => expense._id !== id)
     } else if (arrayName === 'Archivedexpenses') {
@@ -360,7 +347,7 @@ const userDelete = async (id: any, arrayName: string) => {
   }
 }
 
-const searchQuery = ref('') 
+const searchQuery = ref('')
 
 const filteredExpenses = computed(() => {
   return expenses.value.filter((expense) => {
@@ -394,9 +381,8 @@ onMounted(() => {
   border: 1px solid #e0e0e0;
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s; 
+  transition: transform 0.2s;
 }
-
 
 .custom-card:hover {
   transform: translateY(5px) scale(1.02);
@@ -463,26 +449,28 @@ onMounted(() => {
   color: black !important;
 }
 .my-card {
-  background: linear-gradient(90deg, #dfe3e7, #d3dbf1);
+  background: linear-gradient(90deg, hwb(0 100% 0%), hsl(0, 0%, 100%));
   padding: 5px;
   margin-top: 2px;
   border-radius: 5px;
 }
 .archive-participants {
-  background: linear-gradient(90deg, #163b5f, #0f2158);
+  background: linear-gradient(90deg, #160024, rgb(78, 1, 114), #1c0129);
+
   color: white !important;
   padding: 10px;
   border-radius: 10px;
 }
 .custom-card-header {
-  background: linear-gradient(90deg, #040e18, #9bafe6);
+  background: linear-gradient(90deg, #160024, rgb(78, 1, 114), #1c0129);
+
   color: white;
   padding: 10px;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
 }
 .date-background {
-  background: #9ab1f3;
+  background: #dfc3f0;
   color: black !important;
   padding-bottom: 1px;
   text-align: center;

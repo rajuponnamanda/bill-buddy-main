@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container-fluid">
-      <router-link to="/" class="navbar-brand">Split Wise</router-link>
+      <router-link to="/" class="navbar-brand heading">Split Wise</router-link>
 
       <button
         class="navbar-toggler"
@@ -18,12 +18,23 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <router-link to="/Mysplits" class="nav-link" aria-current="page" aria-selected="false">
+            <router-link
+              to="/Mysplits"
+              v-if="isAuthenticated"
+              class="nav-link"
+              aria-current="page"
+              aria-selected="false"
+            >
               My Splits
             </router-link>
           </li>
           <li class="nav-item">
-            <router-link to="/Addsplit" class="nav-link" aria-selected="true">
+            <router-link
+              to="/Addsplit"
+              v-if="isAuthenticated"
+              class="nav-link"
+              aria-selected="true"
+            >
               Add Split
             </router-link>
           </li>
@@ -68,8 +79,6 @@
     </div>
   </nav>
 </template>
-
-
 
 <script setup lang="ts">
 import { useAuth0 } from '@auth0/auth0-vue'
@@ -119,17 +128,21 @@ const handleLogout = () => {
 
 <style scoped>
 .navbar {
-  background: linear-gradient(90deg, #010f1d, rgb(1, 54, 114), #113053);
+  background: linear-gradient(90deg, #160024, rgb(78, 1, 114), #230033);
 }
 .custom-button {
-  background-color: #013061;
+  background-color: transparent;
   color: rgb(253, 253, 253);
   padding: 10px 20px;
   border: none;
-  border-radius: 45%;
   cursor: pointer;
   font-size: 15px;
   transition: background-color 0.3s;
   font-weight: bolder;
+}
+.heading {
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  font-size: 24px;
+  
 }
 </style>
