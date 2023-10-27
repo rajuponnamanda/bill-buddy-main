@@ -8,7 +8,12 @@
           <div class="custom-card-header d-flex justify-content-between">
             <h5 class="card-title">Expense Details</h5>
             <router-link to="/Mysplits" class="border-0 rounded-pill text-dark">
-              <i class="bi bi-arrow-left-circle-fill"></i>
+              <i
+                class="bi bi-arrow-left-circle-fill text-white"
+                data-toggle="tooltip"
+                title="Back"
+                data-placement="top"
+              ></i>
             </router-link>
           </div>
           <div class="custom-card-body">
@@ -19,14 +24,16 @@
                 id="expenseDescription"
                 class="form-control"
                 v-model="formData.description"
+                placeholder="Description"
               />
             </div>
+            <!-- Payer Dropdown -->
             <div class="mb-3">
               <label for="payerUserId" class="form-label">Payer</label>
               <select id="payerUserId" class="form-select" v-model="formData.payerUserId">
                 <option value="" disabled>Select a payer</option>
                 <option v-for="email in suggestedEmails" :key="email" :value="email">
-                  {{ email }}
+                  {{ emailWithMe(email, formData.payerUserId, user.email) }}
                 </option>
               </select>
             </div>
@@ -49,7 +56,12 @@
           <div class="custom-card-header d-flex justify-content-between">
             <h5 class="card-title">Participants</h5>
             <button class="add-button border-0 bg-dark rounded-pill" @click="addParticipant">
-              <i class="bi bi-person-fill-add"></i>
+              <i
+                class="bi bi-person-fill-add"
+                data-toggle="tooltip"
+                title="Add"
+                data-placement="top"
+              ></i>
             </button>
           </div>
           <div class="custom-card-body">
@@ -57,10 +69,14 @@
               <div class="mb-3 d-flex justify-content-between align-items-center">
                 <label :for="`participantName${index}`" class="form-label me-2">Name:</label>
                 <div class="input-group">
-                  <select id="payerUserId" class="form-select" v-model="participant.userId">
-                    <option value="" disabled>Select a payer</option>
-                    <option v-for="email in suggestedEmails" :key="email" :value="email">
-                      {{ email }}
+                  <select id="participantUserId" class="form-select" v-model="participant.userId">
+                    <option value="" disabled>Select a participant</option>
+                    <option
+                      v-for="email in suggestedEmails.filter(e => e !== formData.payerUserId)"
+                      :key="email"
+                      :value="email"
+                    >
+                      {{ emailWithMe(email, participant.userId, user.email) }}
                     </option>
                   </select>
                 </div>
@@ -70,6 +86,7 @@
                     :id="`participantName${index}`"
                     class="form-control"
                     v-model="participant.share"
+                    type="number"
                   />
                   <button @click="removeParticipant(index)" class="cancel-icon">
                     <i class="bi bi-x text-danger"></i>
@@ -95,21 +112,19 @@
           </div>
         </div>
       </div>
-      <div v-if="isModalVisible" class="modal-overlay ">
-        <div class="modal pt-5">
-          <i class="bi bi-exclamation-triangle-fill text-warning warning-icon"></i>
-          <p class="text-dark">Your  total share is Greater than total amount which is not valid </p>
-          <button @click="closeModal">OK</button>
-        </div>
-      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import axiosInstance from '../services/service'
 import router from '../router'
+import { useAuth0 } from '@auth0/auth0-vue'
+
+const { user, isAuthenticated } = useAuth0()
+
+
 const formData = ref({
   payerUserId: '',
   description: '',
@@ -129,6 +144,16 @@ type Participant = {
   userId: string
   share: number
 }
+
+
+
+// Define computed property for email display with 'Me'
+const emailWithMe = computed(() => (email: any, userId: any, currentUser: any) => {
+  if (currentUser && email === currentUser) {
+    return `${email} (ME)`;
+  }
+  return email;
+}) 
 
 const isModalVisible = ref(false)
 
@@ -231,6 +256,8 @@ const clearFormData = () => {
 onMounted(() => {
   getSuggestedEmails()
 })
+
+
 </script>
 
 <style scoped>
@@ -276,9 +303,8 @@ onMounted(() => {
   margin-top: 1rem;
 }
 
-.warning-icon{
+.warning-icon {
   font-size: 50px;
-  
 }
 .text-danger {
   color: red;
@@ -314,8 +340,6 @@ onMounted(() => {
   margin-left: 40%;
 }
 
-
-
 /* Modal Text */
 .modal p {
   font-size: 16px;
@@ -325,7 +349,7 @@ onMounted(() => {
 
 /* OK Button */
 .modal button {
-  background: #007BFF; /* Blue color */
+  background: #007bff; /* Blue color */
   color: #fff;
   border: none;
   padding: 10px 20px;
@@ -338,6 +362,4 @@ onMounted(() => {
 .modal button:hover {
   background: #0056b3; /* Darker blue on hover */
 }
-
-
 </style>
