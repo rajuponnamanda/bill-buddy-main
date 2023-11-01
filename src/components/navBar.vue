@@ -1,11 +1,11 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark">
+  <nav class="navbar bg-nav navbar-expand-lg navbar-dark">
     <div class="container-fluid">
-      <router-link to="/" class="navbar-brand heading">Split Wise</router-link>
+      <router-link to="/" class="navbar-brand heading  h-color">Split Wise</router-link>
 
       <button
-        class="navbar-toggler"
-        type="button"
+        class="navbar-toggler bg-primary"
+        type="button" 
         data-bs-toggle="collapse"
         data-bs-target="#navbarSupportedContent"
         aria-controls="navbarSupportedContent"
@@ -21,7 +21,7 @@
             <router-link
               to="/Mysplits"
               v-if="isAuthenticated"
-              class="nav-link"
+              class="nav-link  h-color"
               aria-current="page"
               aria-selected="false"
             >
@@ -32,7 +32,7 @@
             <router-link
               to="/Addsplit"
               v-if="isAuthenticated"
-              class="nav-link"
+              class="nav-link  h-color"
               aria-selected="true"
             >
               Add Split
@@ -49,7 +49,7 @@
         data-placement="top"
         @click="login"
       >
-        <i class="bi bi-box-arrow-in-right"></i> Log In
+        <i class="bi bi-box-arrow-in-right  h-color"></i> Log In
       </button>
 
       <div
@@ -83,6 +83,7 @@
 <script setup lang="ts">
 import { useAuth0 } from '@auth0/auth0-vue'
 import { ref, onMounted, computed } from 'vue'
+import router from '../router'
 import axiosInstance from '../services/service'
 
 const { user, isAuthenticated, loginWithRedirect, logout } = useAuth0()
@@ -104,6 +105,7 @@ const isActive = (route: any) => {
 }
 const login = () => {
   loginWithRedirect()
+  router.push("/Mysplits")
 }
 const fetchData = async () => {
   try {
@@ -126,10 +128,12 @@ const handleLogout = () => {
 }
 </script>
 
-<style scoped>
-.navbar {
-  background: linear-gradient(90deg, #160024, rgb(78, 1, 114), #230033);
-}
+<style scoped lang="scss">
+//  .navbar {
+//   background: linear-gradient(90deg, #160024, rgb(78, 1, 114), #230033);
+// } 
+
+
 .custom-button {
   background-color: transparent;
   color: rgb(253, 253, 253);

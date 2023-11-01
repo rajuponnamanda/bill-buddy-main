@@ -1,24 +1,24 @@
 <template>
-  <div class="main-container">
+  <div class="main-container bg-nav">
     <div v-if="!isAuthenticated">
-    <div class="text-container">
-      <i class="bi bi-cash-coin cash-icon text-white"></i>
-      <h1 class="text-center hedding">WELCOME TO BILL BUDDY</h1>
-      <h5 class="text-center subtitle">"I'm there to remind your Share"</h5>
+      <div class="text-container">
+        <i class="bi bi-cash-coin cash-icon h-color icon-transition"></i>
+        <h1 class="text-center hedding h-color">WELCOME TO BILL BUDDY</h1>
+        <h5 class="text-center subtitle h-color">"I'm here to remind you to share"</h5>
+      </div>
+      <div class="text-center">
+        <p class="paragraph text-center mt-5 h-color">For more details, please login
+          <i class="bi icon bi-arrow-up-right-square-fill ms-2 icon-transition"></i>
+        </p>
+      </div>
     </div>
-    <div class="text-center">
-      <p class="paragraph text-center mt-5">For more details, please login
-        <i class="bi icon bi-arrow-up-right-square-fill ms-2"></i>
-      </p>
+    <div v-if="isAuthenticated">
+      <div class="text-container">
+        <i class="bi bi-cash-coin cash-icon h-color icon-transition"></i>
+        <h1 class="text-center hedding h-color">WELCOME TO BILL BUDDY</h1>
+        <h5 class="text-center subtitle h-color">"I'm here to remind you to share"</h5>
+      </div>
     </div>
-  </div>
-  <div v-if="isAuthenticated">
-    <div class="text-container">
-      <i class="bi bi-cash-coin cash-icon text-white"></i>
-      <h1 class="text-center hedding">WELCOME TO BILL BUDDY</h1>
-      <h5 class="text-center subtitle">"I'm there to remind your Share"</h5>
-    </div>
-  </div>
   </div>
 </template>
 
@@ -27,14 +27,12 @@ import { useAuth0 } from '@auth0/auth0-vue'
 import { reactive } from 'vue'
 
 const { user, isAuthenticated, loginWithRedirect, logout } = useAuth0()
-
 </script>
 
 <style scoped>
 .main-container {
-  background: linear-gradient(90deg, #160024, rgb(78, 1, 114), #1c0129);
-  min-height: 94vh; /* Set a minimum height to ensure content is visible on small screens */
-  padding: 20px; /* Add some padding to the container */
+  min-height: 94vh;
+  padding: 20px;
 }
 
 .text-container {
@@ -44,52 +42,58 @@ const { user, isAuthenticated, loginWithRedirect, logout } = useAuth0()
 
 .hedding {
   font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-  color: white;
-  font-size: 48px; /* Reduce font size for smaller screens */
-  text-shadow: #ffffff;
+  font-size: 48px;
 }
+
 .bi-cash-coin {
-  font-size: 52px; /* You can adjust the size as needed */
+  font-size: 52px;
 }
+
 .paragraph {
   font-family: sans-serif;
-  color: rgb(255, 255, 255);
-  font-size: 16px; /* Reduce font size for smaller screens */
-  text-shadow: #ffffff;
+  font-size: 16px;
   text-align: center;
   text-decoration-line: underline;
 }
 
 .subtitle {
   font-family: monospace;
-  color: rgb(255, 255, 255);
-  font-size: 24px; /* Reduce font size for smaller screens */
-  text-shadow: #ffffff;
+  font-size: 24px;
 }
 
 .icon {
-  font-size: 24px; /* Reduce icon size for smaller screens */
+  font-size: 24px;
+}
+
+/* Add a transition on icon hover */
+.icon-transition {
+  transition: transform 0.3s ease;
+}
+
+.icon-transition:hover {
+  transform: scale(1.1);
 }
 
 /* Media query for smaller screens (adjust as needed) */
 @media (max-width: 768px) {
   .main-container {
-    padding: 10px; /* Reduce padding for smaller screens */
+    padding: 10px;
   }
 
   .hedding {
-    font-size: 36px; /* Further reduce font size for very small screens */
+    font-size: 36px;
   }
 
   .paragraph {
-    font-size: 14px; /* Further reduce font size for very small screens */
+    font-size: 14px;
   }
+
   .subtitle {
-    font-size: 20px; /* Further reduce font size for very small screens */
+    font-size: 20px;
   }
 
   .icon {
-    font-size: 20px; /* Further reduce icon size for very small screens */
+    font-size: 20px;
   }
 }
 </style>

@@ -53,11 +53,11 @@
           </div>
         </div>
         <div v-else>
-          <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
-            <div class="col" v-for="expense in filteredExpenses" :key="expense._id">
+          <div class="row row-cols-1  row-cols-md-2 row-cols-lg-3">
+            <div class="col  " v-for="expense in filteredExpenses" :key="expense._id">
               <div class="custom-card mb-4">
-                <div class="custom-card-header d-flex justify-content-between">
-                  <h5 class="card-title text-truncate">{{ expense.description }}</h5>
+                <div class="custom-card-header bg-nav d-flex  justify-content-between">
+                  <h5 class="card-title text-truncate">{{ toPascalCase(expense.description) }}</h5>
                   <i
                     v-if="expense.payerUserId === user?.email"
                     class="bi bi-trash-fill text-white"
@@ -81,9 +81,8 @@
                               alt="Payer's Profile"
                             />
                           </p>
-                          <span class="userId ms-1 ps-2 pe-1 text-truncate">{{
-                            getPayerUsername(expense.payerUserId)
-                          }}</span>
+                          <span class="userId ms-1 ps-2 pe-1 text-truncate bg-date">{{
+                            getPayerUsername(expense.payerUserId)}}</span>
                         </div>
                       </div>
 
@@ -123,10 +122,10 @@
                         ${{ expense.amount.toFixed(2) }}
                       </span>
                     </h6>
-                    <div class="mb-0 custom-text d-flex">
+                    <div class="mb-0 custom-text d-flex ">
                       <strong>Date:</strong>
                       <div class="d-flex align-items-center">
-                        <span class="ps-1 pe-1 ms-2 text-white date-background rounded-pill">
+                        <span class="ps-1 pe-1 ms-2  bg-date  rounded-pill">
                           {{ formatDate(expense.date) }}
                         </span>
                       </div>
@@ -135,9 +134,9 @@
                   <div class="text-center d-flex justify-content-between mb-2">
                     <strong class="custom-text">Participants</strong>
                   </div>
-                  <div class="d-flex">
+                  <div class="d-flex bg-nav rounded p-3">
                     <div v-for="participant in expense.participants" :key="participant.userId">
-                      <div class="d-flex justify-content-between align-items-center">
+                      <div class="d-flex justify-content-between  align-items-center">
                         <div class="align-items-center">
                           <img
                             :src="participant.profilePicture"
@@ -165,7 +164,7 @@
             <div class="col" v-for="expense in Archivedexpenses" :key="expense._id">
               <div class="mt-2">
                 <div class="custom-card shadow-lg mb-4">
-                  <div class="custom-card-header d-flex justify-content-between">
+                  <div class="custom-card-header bg-nav d-flex justify-content-between">
                     <h5 class="card-title text-truncate">{{ expense.description }}</h5>
                     <i
                       v-if="expense.payerUserId === user?.email"
@@ -178,7 +177,7 @@
                       <div class="col-12 mb-2">
                         <strong class="text-center">Payer</strong>
                       </div>
-                      <span class="userId ps-1 pe-1 text-truncate">{{ expense.payerUserId }}</span>
+                      <span class="userId ps-1 pe-1 text-truncate bg-date">{{ expense.payerUserId }}</span>
                       <div class="mt-3 mb-3 col-12 d-flex justify-content-between">
                         <router-link :to="{ name: 'view', params: { id: expense._id } }">
                           <i
@@ -209,7 +208,7 @@
                       <div class="mb-0 custom-text d-flex">
                         <strong>Date:</strong>
                         <div class="d-flex align-items-center">
-                          <span class="ps-1 pe-1 ms-2 text-white date-background rounded-pill">
+                          <span class="ps-1 pe-1 ms-2 h-color bg-date date-background rounded-pill">
                             {{ formatDate(expense.date) }}
                           </span>
                         </div>
@@ -218,7 +217,7 @@
                     <div class="text-center d-flex justify-content-between mb-2">
                       <strong class="custom-text">Participants</strong>
                     </div>
-                    <div class="align-items-center archive-participants text-dark">
+                    <div class="align-items-center archive-participants bg-nav  ">
                       <div v-for="participant in expense.participants" :key="participant.userId">
                         <div class="text-center">
                           {{ participant.userId }}
@@ -264,6 +263,11 @@ type Participant = {
   share: number
   profilePicture: string
 }
+const toPascalCase = (description: string) => {
+  return description.split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join('');
+};
 const loading = ref(true)
 
 const expenses = ref<Transaction[]>([])
@@ -388,7 +392,6 @@ onMounted(() => {
   transform: translateY(5px) scale(1.02);
 }
 .userId {
-  background-color: #a4beee;
   border-radius: 5px;
   padding-bottom: 2px;
 }
@@ -455,14 +458,13 @@ onMounted(() => {
   border-radius: 5px;
 }
 .archive-participants {
-  background: linear-gradient(90deg, #160024, rgb(78, 1, 114), #1c0129);
-
-  color: white !important;
   padding: 10px;
   border-radius: 10px;
+  color:white;
+  font-weight: 500;
 }
 .custom-card-header {
-  background: linear-gradient(90deg, #160024, rgb(78, 1, 114), #1c0129);
+  
 
   color: white;
   padding: 10px;
@@ -470,8 +472,6 @@ onMounted(() => {
   border-top-right-radius: 10px;
 }
 .date-background {
-  background: #dfc3f0;
-  color: black !important;
   padding-bottom: 1px;
   text-align: center;
   justify-content: center;

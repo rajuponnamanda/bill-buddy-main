@@ -1,11 +1,10 @@
 <template>
   <div class="container mt-4">
-    <div v-if="isModalVisible"></div>
     <h1 class="mb-4 text-center">Add Expense</h1>
     <div class="row">
       <div class="col-md-12 add-card">
         <div class="custom-card mb-4">
-          <div class="custom-card-header d-flex justify-content-between">
+          <div class="custom-card-header bg-nav d-flex justify-content-between">
             <h5 class="card-title">Expense Details</h5>
             <router-link to="/Mysplits" class="border-0 rounded-pill text-dark">
               <i
@@ -25,17 +24,30 @@
                 class="form-control"
                 v-model="formData.description"
                 placeholder="Description"
+                :class="{ 'is-invalid': !isDescriptionValid }"
+                @blur="validateDescription"
               />
+              <p v-if="!isDescriptionValid" class="text-danger">Description is required.</p>
             </div>
-            <!-- Payer Dropdown -->
             <div class="mb-3">
               <label for="payerUserId" class="form-label">Payer</label>
-              <select id="payerUserId" class="form-select" v-model="formData.payerUserId">
+              <select id="payerUserId" class="form-select" v-model="formData.payerUserId"
+                :class="{ 'is-invalid': !isPayerValid }"
+                @blur="validatePayer">
                 <option value="" disabled>Select a payer</option>
-                <option v-for="email in suggestedEmails" :key="email" :value="email">
-                  {{ emailWithMe(email, formData.payerUserId, user.email) }}
+                <option
+                  v-for="email in suggestedEmails"
+                  :key="email"
+                  :value="email"
+                  :class="{
+                    'text-white bg-nav': email === user?.email,
+                    'fw-semibold': email === user?.email
+                  }"
+                >
+                  {{ emailWithMe(email, formData.payerUserId, user?.email) }}
                 </option>
               </select>
+              <p v-if="!isPayerValid" class="text-danger">Payer is required.</p>
             </div>
             <div class="mb-3">
               <label for="expenseAmount" class="form-label">Amount</label>
@@ -44,16 +56,27 @@
                 id="expenseAmount"
                 class="form-control"
                 v-model="formData.amount"
+                :class="{ 'is-invalid': !isAmountValid }"
+                @blur="validateAmount"
               />
+              <p v-if="!isAmountValid" class="text-danger">Amount must be greater than 0.</p>
             </div>
             <div class="mb-3">
               <label for="expenseDate" class="form-label">Date</label>
-              <input type="date" id="expenseDate" class="form-control" v-model="formData.date" />
+              <input
+                type="date"
+                id="expenseDate"
+                class="form-control"
+                v-model="formData.date"
+                :class="{ 'is-invalid': !isDateValid }"
+                @blur="validateDate"
+              />
+              <p v-if="!isDateValid" class="text-danger">Date is required.</p>
             </div>
           </div>
         </div>
         <div class="custom-card mb-4">
-          <div class="custom-card-header d-flex justify-content-between">
+          <div class="custom-card-header bg-nav d-flex justify-content-between">
             <h5 class="card-title">Participants</h5>
             <button class="add-button border-0 bg-dark rounded-pill" @click="addParticipant">
               <i
@@ -72,11 +95,15 @@
                   <select id="participantUserId" class="form-select" v-model="participant.userId">
                     <option value="" disabled>Select a participant</option>
                     <option
-                      v-for="email in suggestedEmails.filter(e => e !== formData.payerUserId)"
+                      v-for="email in suggestedEmails.filter((e) => e !== formData.payerUserId)"
                       :key="email"
                       :value="email"
+                      :class="{
+                        'text-white bg-nav': email === user?.email,
+                        'fw-semibold': email === user?.email
+                      }"
                     >
-                      {{ emailWithMe(email, participant.userId, user.email) }}
+                      {{ emailWithMe(email, participant.userId, user?.email) }}
                     </option>
                   </select>
                 </div>
@@ -98,7 +125,7 @@
               <button
                 class="btn btn-secondary text-dark me-3 ps-4 pe-4 rounded-pill"
                 @click="saveExpense"
-                v-if="formData.description && formData.payerUserId && formData.amount > 0"
+                v-if="isDescriptionValid && isPayerValid && isAmountValid && isFormComplete"
               >
                 <i class="bi bi-floppy-fill"></i> Save
               </button>
@@ -115,15 +142,14 @@
     </div>
   </div>
 </template>
-
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import axiosInstance from '../services/service'
 import router from '../router'
+import { useToast } from 'vue-toastification'
 import { useAuth0 } from '@auth0/auth0-vue'
 
 const { user, isAuthenticated } = useAuth0()
-
 
 const formData = ref({
   payerUserId: '',
@@ -145,15 +171,40 @@ type Participant = {
   share: number
 }
 
+const toast = useToast()
+
+
+const isFormComplete = computed(() => {
+  return (
+    isDescriptionValid.value &&
+    isPayerValid.value &&
+    isAmountValid.value &&
+    isDateValid.value
+  );
+});
+
+const validateDate = () => {
+  isDateValid.value = !!formData.value.date;
+}
+const validateDescription = () => {
+  isDescriptionValid.value = !!formData.value.description;
+}
+const validateAmount =()=>{
+  isAmountValid.value = !!formData.value.amount;
+}
+const validatePayer = ()=>{
+  isPayerValid.value = !!formData.value.payerUserId
+}
+
 
 
 // Define computed property for email display with 'Me'
-const emailWithMe = computed(() => (email: any, userId: any, currentUser: any) => {
+const emailWithMe = computed(() => (email: string, userId: any, currentUser: any) => {
   if (currentUser && email === currentUser) {
-    return `${email} (ME)`;
+    return `${email.replace(userId, `${userId}`)} (Me)`
   }
-  return email;
-}) 
+  return email
+})
 
 const isModalVisible = ref(false)
 
@@ -161,6 +212,12 @@ const suggestedEmails = ref([])
 const selectedEmail = ref('You')
 const selectedPeopleToAdd = ref([])
 const selectedPeople = ref<Participant[]>([])
+
+// Form validation states
+const isDescriptionValid = ref(true)
+const isPayerValid = ref(true)
+const isAmountValid = ref(true)
+const isDateValid = ref(true)
 
 const getSuggestedEmails = async () => {
   try {
@@ -176,7 +233,7 @@ const closeModal = () => {
 }
 
 const cancelExpense = () => {
-  // Clear the form data
+  // Clear the form data and reset validation states
   formData.value.description = ''
   formData.value.amount = 0
   formData.value.payerUserId = ''
@@ -189,6 +246,11 @@ const cancelExpense = () => {
     }
   ]
   selectedPeople.value = []
+  // Reset validation states
+  isDescriptionValid.value = true
+  isPayerValid.value = true
+  isAmountValid.value = true
+  isDateValid.value = true
 }
 
 const addSelectedPeople = () => {
@@ -207,35 +269,48 @@ const removeParticipant = (index: number) => {
   formData.value.participants.splice(index, 1)
 }
 
-const saveExpense = async () => {
-  try {
-    const postData = {
-      description: formData.value.description,
-      amount: formData.value.amount,
-      payerUserId: formData.value.payerUserId,
-      participants: formData.value.participants,
-      isArchived: formData.value.isArchived,
-      date: formData.value.date
+async function saveExpense() {
+  // Reset validation states
+  isDescriptionValid.value = !!formData.value.description
+  isPayerValid.value = !!formData.value.payerUserId
+  isAmountValid.value = formData.value.amount > 0
+  isDateValid.value = !!formData.value.date
+
+  // Check if all validations pass
+  if (isDescriptionValid.value && isPayerValid.value && isAmountValid.value && isDateValid.value) {
+    try {
+      const postData = {
+        description: formData.value.description,
+        amount: formData.value.amount,
+        payerUserId: formData.value.payerUserId,
+        participants: formData.value.participants,
+        isArchived: formData.value.isArchived,
+        date: formData.value.date
+      }
+
+      let totalShare = 0;
+
+      // Calculate the total share
+      postData.participants.forEach((participant) => {
+        totalShare += participant.share;
+      });
+
+      if (totalShare === postData.amount || totalShare < postData.amount) {
+        const response = await axiosInstance.post('/addTransaction', postData);
+        console.log('Response:', response.data);
+
+        toast.success('Transaction updated:', response.data);
+
+        clearFormData();
+        router.push('/Mysplits');
+      } else {
+        toast.error('Please enter a valid share. Your share is more than the total amount:', totalShare)
+      }
+    } catch (error) {
+      // Handle errors and display a toast message
+      console.error('Error updating transaction:', error);
+      toast.error('Error updating transaction');
     }
-
-    let totalShare = 0
-
-    // Calculate the total share
-    postData.participants.forEach((participant) => {
-      totalShare += participant.share // No need to parse it
-    })
-
-    if (totalShare === postData.amount || totalShare < postData.amount) {
-      const response = await axiosInstance.post('/addTransaction', postData)
-      console.log('Response:', response.data)
-      clearFormData() // Clear the form data after successful submission
-      router.push('/Mysplits')
-    } else {
-      isModalVisible.value = true
-      console.log('sdsss')
-    }
-  } catch (error) {
-    console.error('Error:', error)
   }
 }
 
@@ -251,13 +326,16 @@ const clearFormData = () => {
       share: 0
     }
   ]
+  // Reset validation states
+  isDescriptionValid.value = true
+  isPayerValid.value = true
+  isAmountValid.value = true
+  isDateValid.value = true
 }
 
 onMounted(() => {
-  getSuggestedEmails()
+  getSuggestedEmails();
 })
-
-
 </script>
 
 <style scoped>
@@ -269,7 +347,6 @@ onMounted(() => {
 }
 
 .custom-card-header {
-  background: linear-gradient(90deg, #160024, rgb(78, 1, 114), #1c0129);
   color: white;
   padding: 10px;
   border-top-left-radius: 10px;
@@ -289,6 +366,9 @@ onMounted(() => {
 }
 .custom-card-body {
   padding: 20px;
+}
+#userId {
+  font-weight: bold;
 }
 
 .form-label {
@@ -358,8 +438,4 @@ onMounted(() => {
   font-size: 14px;
 }
 
-/* OK Button Hover Effect */
-.modal button:hover {
-  background: #0056b3; /* Darker blue on hover */
-}
 </style>

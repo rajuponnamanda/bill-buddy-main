@@ -1,11 +1,11 @@
 <template>
   <div class="container mt-4">
     <h1 class="mb-4 text-center">Expense Details</h1>
-    <div class="row justify-content-center">
-      <div class="col-md-8" v-for="expense in expenses" :key="expense._id">
+    <div class="row justify-content-center ">
+      <div class="col-md-8 " v-for="expense in expenses" :key="expense._id">
         <div class="card mb-4">
-          <div class="card-header d-flex justify-content-between custom-card-header text-white">
-            <h5 class="card-title">{{ expense.description }}</h5>
+          <div class="card-header d-flex bg-nav justify-content-between custom-card-header text-white">
+            <h5 class="card-title ">{{ expense.description }}</h5>
             <router-link to="/Mysplits" class="text-dark rounded-pill">
               <i class="bi bi-arrow-left-circle-fill text-white"></i>
             </router-link>
@@ -14,7 +14,7 @@
             <div class="expense-info">
               <div class="payer-info mt-2">
                 <strong class="me-2">Payer:</strong>
-                <span class="user-id">{{ expense.payerUserId }}</span>
+                <span class="user-id bg-date">{{ expense.payerUserId }}</span>
               </div>
               <hr class="custom-hr" />
               <div class="expense-amount">
@@ -31,16 +31,16 @@
             <div class="participants">
               <h5 class="mt-4 mb-3">Participants</h5>
               <div class="row">
-                <div class="col-md-6" v-for="participant in expense.participants" :key="participant.userId">
-                  <div class="card mb-3">
-                    <div class="card-body participant-item m-0 shadow-lg">
+                <div class="col-md-6 " v-for="participant in expense.participants" :key="participant.userId">
+                  <div class="card mb-3 ">
+                    <div class="card-body participant-item m-0 bg-nav shadow-lg">
                       <div class="participant-info">
-                        <strong class="me-2">Share:</strong>
-                        <span class="badge bg-success rounded-pill mb-2">
+                        <strong class="me-2 text-white">Share:</strong>
+                        <span class="badge bg-success rounded-pill mb-2 fw-semibold">
                           ${{ participant.share }}
                         </span>
                       </div>
-                      <div class="user-id">
+                      <div class="user-id bg-date">
                         {{ participant.userId }}
                       </div>
                     </div>
@@ -135,8 +135,6 @@ onMounted(() => {
 }
 
 .custom-card-header {
-  background: linear-gradient(90deg, #160024, rgb(78, 1, 114), #1c0129);
-
   color: white;
   padding: 10px;
   align-items: center;
@@ -181,7 +179,6 @@ onMounted(() => {
 }
 
 .participant-item {
-  background: linear-gradient(90deg, #ddcffd, #cec7d4);
   margin: 10px;
   text-align: center;
 }
@@ -194,8 +191,6 @@ onMounted(() => {
 }
 
 .user-id {
-  background-color: #5c2775;
-  color: rgb(255, 255, 255);
   border-radius: 5px;
   padding: 5px 10px;
 }
