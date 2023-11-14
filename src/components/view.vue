@@ -4,13 +4,13 @@
     <div class="row justify-content-center ">
       <div class="col-md-8 " v-for="expense in expenses" :key="expense._id">
         <div class="card mb-4">
-          <div class="card-header d-flex bg-nav justify-content-between custom-card-header text-white">
+          <div class="card-header d-flex bg-nav justify-content-between  custom-card-header text-white">
             <h5 class="card-title ">{{ expense.description }}</h5>
             <router-link to="/Mysplits" class="text-dark rounded-pill">
               <i class="bi bi-arrow-left-circle-fill text-white"></i>
             </router-link>
           </div>
-          <div class="card-body">
+          <div class="card-body bg-user">
             <div class="expense-info">
               <div class="payer-info mt-2">
                 <strong class="me-2">Payer:</strong>
@@ -23,9 +23,10 @@
                   ${{ expense.amount.toFixed(2) }}
                 </span>
               </div>
-              <div class="expense-date">
+              <div class="expense-date  d-flex">
                 <strong>Date:</strong>
-                {{ formatDate(expense.date) }}
+                <div class="bg-date pt-1 ps-2 pe-2"> {{ formatDate(expense.date) }} </div>
+                
               </div>
             </div>
             <div class="participants">

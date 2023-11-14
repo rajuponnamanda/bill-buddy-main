@@ -1,6 +1,6 @@
 <template>
   <div class="container mt-4">
-    <h1 class="mb-4 text-center">Edit Expense</h1>
+    <h1 class="mb-4 text-center heading">Edit Expense</h1>
     <div class="row">
       <div class="col-md-8 mx-auto">
         <div class="custom-card mb-4">
@@ -94,11 +94,13 @@
     </tbody>
   </table>
   <div class="d-flex justify-content-center mt-4">
-    <button class="btn bg-nav text-white fw-semibold rounded-pill me-3" @click="updateExpense">
-      <i class="bi bi-pencil-fill"></i> Update Expense
+    <button class="button-save" @click="updateExpense">
+      <!-- <i class="bi bi-pencil-fill"></i>  -->
+      Update Expense
     </button>
-    <button class="btn btn-secondary rounded-pill" @click="cancelExpense">
-      <i class="bi bi-x-square-fill"></i> Cancel
+    <button class="button-cancle" @click="cancelExpense">
+      <!-- <i class="bi bi-x-square-fill"></i>  -->
+      Cancel
     </button>
   </div>
 </div>
@@ -114,6 +116,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import axiosInstance from '../services/service'
 import type { GetTransactionData } from '../models/model'
+import { useToast } from 'vue-toastification';
 
 const expense = ref<GetTransactionData | null>(null)
 const suggestedEmails = ref<string[]>([])
@@ -178,18 +181,24 @@ const updateDate = (event: Event) => {
 }
 
 const updateExpense = async () => {
+  const toast = useToast();
+
   if (expense.value) {
     try {
-      const transactionId = route.params.id
-      const postData = expense.value
-      const response = await axiosInstance.put(`/editTransaction/${transactionId}`, postData)
-      console.log('Expense updated successfully:', response)
-      router.push('/Mysplits')
-    } catch (error) {
-      console.error('Error updating expense:', error)
+      const transactionId = route.params.id;
+      const postData = expense.value;
+      const response = await axiosInstance.put(`/editTransaction/${transactionId}`, postData);
+      console.log('Expense updated successfully:', response.data);
+      toast.success('Expense updated successfully');
+      router.push('/Mysplits');
+    } catch (error: any) {
+      console.error('Error updating expense:', error);
+      toast.error('Error updating expense: ' + error);
     }
+  } else {
+    toast.error('Expense value is empty');
   }
-}
+};
 
 const getSuggestedEmails = async () => {
   try {

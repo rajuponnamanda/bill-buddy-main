@@ -1,6 +1,6 @@
 <template>
   <div class="container mt-4">
-    <h1 class="mb-4 text-center">Add Expense</h1>
+    <h1 class="mb-4 text-center heading">Add Expense</h1>
     <div class="row">
       <div class="col-md-12 add-card">
         <div class="custom-card mb-4">
@@ -18,35 +18,66 @@
           <div class="custom-card-body">
             <div class="mb-3">
               <label for="expenseDescription" class="form-label">Description</label>
+
               <input
-                type="text"
+                type="name"
                 id="expenseDescription"
                 class="form-control"
                 v-model="formData.description"
-                placeholder="Description"
-                :class="{ 'is-invalid': !isDescriptionValid }"
+                :class="{
+                  'input-error':
+                    !isDescriptionValid || !isDescriptionLengthValid || hasNumbersInDescription,
+                  'input-valid':
+                    isDescriptionValid && isDescriptionLengthValid && !hasNumbersInDescription
+                }"
                 @blur="validateDescription"
+                @input="validateDescriptionLength"
               />
+
               <p v-if="!isDescriptionValid" class="text-danger">Description is required.</p>
+              <p v-if="!isDescriptionLengthValid" class="text-danger">
+                Description is should be in below 20 letters
+              </p>
             </div>
             <div class="mb-3">
               <label for="payerUserId" class="form-label">Payer</label>
-              <select id="payerUserId" class="form-select" v-model="formData.payerUserId"
-                :class="{ 'is-invalid': !isPayerValid }"
-                @blur="validatePayer">
-                <option value="" disabled>Select a payer</option>
-                <option
-                  v-for="email in suggestedEmails"
-                  :key="email"
-                  :value="email"
+              <div class="d-flex justify-content-center payer-div bg-nav border order-secondary">
+                <i class="bi bi-person-circle me-2 text-white" style="font-size: 25px"></i>
+                <div class="d-flex justify-content-center">
+                  <!-- <img
+                    :src="formData.payerProfilePicture"
+                    class="rounded-circle custom-profile-img"
+                    alt="Payer's Profile"
+                  /> -->
+                </div>
+
+                <select
+                  id="payerUserId"
+                  class="form-select"
+                  v-model="formData.payerUserId"
                   :class="{
-                    'text-white bg-nav': email === user?.email,
-                    'fw-semibold': email === user?.email
+                    'input-error': !isPayerValid && formData.payerUserId === '',
+                    'input-valid': isPayerValid && formData.payerUserId !== ''
                   }"
+                  @blur="validatePayer"
                 >
-                  {{ emailWithMe(email, formData.payerUserId, user?.email) }}
-                </option>
-              </select>
+                  <option value="" disabled>Select a payer</option>
+                  <option
+                    v-for="email in suggestedEmails"
+                    :key="email"
+                    :value="email"
+                    :class="{
+                      'text-white bg-nav': email === user?.email,
+                      'fw-semibold': email === user?.email
+                    }"
+                  >
+                    {{ emailWithMe(email, formData.payerUserId, user?.email) }}
+                  </option>
+                </select>
+
+                
+              </div>
+
               <p v-if="!isPayerValid" class="text-danger">Payer is required.</p>
             </div>
             <div class="mb-3">
@@ -56,8 +87,13 @@
                 id="expenseAmount"
                 class="form-control"
                 v-model="formData.amount"
-                :class="{ 'is-invalid': !isAmountValid }"
+                :class="{
+                  'input-error': !isAmountValid && formData.amount === 0,
+                  'input-valid': isAmountValid && formData.amount > 0
+                }"
                 @blur="validateAmount"
+                @input="validateAmount"
+                inputmode="numeric"
               />
               <p v-if="!isAmountValid" class="text-danger">Amount must be greater than 0.</p>
             </div>
@@ -68,7 +104,10 @@
                 id="expenseDate"
                 class="form-control"
                 v-model="formData.date"
-                :class="{ 'is-invalid': !isDateValid }"
+                :class="{
+                  'input-error': !isDateValid && formData.date === '',
+                  'input-valid': isDateValid && formData.date !== ''
+                }"
                 @blur="validateDate"
               />
               <p v-if="!isDateValid" class="text-danger">Date is required.</p>
@@ -115,25 +154,24 @@
                     v-model="participant.share"
                     type="number"
                   />
-                  <button @click="removeParticipant(index)" class="cancel-icon">
-                    <i class="bi bi-x text-danger"></i>
+                  <button @click="removeParticipant(index)" class="cancel-icon bg-danger">
+                    <i class="bi bi-x text-white"></i>
                   </button>
                 </div>
               </div>
             </div>
             <div class="col-4 mx-auto d-flex justify-content-center">
               <button
-                class="btn btn-secondary text-dark me-3 ps-4 pe-4 rounded-pill"
+                class="button-save"
                 @click="saveExpense"
                 v-if="isDescriptionValid && isPayerValid && isAmountValid && isFormComplete"
               >
-                <i class="bi bi-floppy-fill"></i> Save
+                <!-- <i class="bi bi-floppy-fill"></i>  -->
+                Save
               </button>
-              <button
-                class="btn btn-danger text-dark ps-4 pe-4 rounded-pill"
-                @click="cancelExpense"
-              >
-                <i class="bi bi-x-square-fill"></i> Cancel
+              <button class="button-cancle" @click="cancelExpense">
+                <!-- <i class="bi bi-x-square-fill"></i> -->
+                Reset
               </button>
             </div>
           </div>
@@ -170,33 +208,49 @@ type Participant = {
   userId: string
   share: number
 }
+const hasNumbersInDescription = ref(false)
+const validateDescriptionNumbers = () => {
+  hasNumbersInDescription.value = /\d/.test(formData.value.description)
+}
 
-const toast = useToast()
+const validateDescriptionLength = () => {
+  isDescriptionLengthValid.value = formData.value.description.length <= 20
+}
 
+// New ref to track description length validation
+const isDescriptionLengthValid = ref(true)
 
+// Updated form complete computed property
 const isFormComplete = computed(() => {
   return (
     isDescriptionValid.value &&
+    isDescriptionLengthValid.value &&
     isPayerValid.value &&
     isAmountValid.value &&
-    isDateValid.value
-  );
-});
+    isDateValid.value &&
+    !hasNumbersInDescription.value
+  )
+})
+
+const toast = useToast()
+
+// const isFormComplete = computed(() => {
+//   return isDescriptionValid.value && isPayerValid.value && isAmountValid.value && isDateValid.value
+// })
 
 const validateDate = () => {
-  isDateValid.value = !!formData.value.date;
+  isDateValid.value = !!formData.value.date
 }
+
 const validateDescription = () => {
-  isDescriptionValid.value = !!formData.value.description;
+  isDescriptionValid.value = !!formData.value.description
 }
-const validateAmount =()=>{
-  isAmountValid.value = !!formData.value.amount;
+const validateAmount = () => {
+  isAmountValid.value = !!formData.value.amount
 }
-const validatePayer = ()=>{
+const validatePayer = () => {
   isPayerValid.value = !!formData.value.payerUserId
 }
-
-
 
 // Define computed property for email display with 'Me'
 const emailWithMe = computed(() => (email: string, userId: any, currentUser: any) => {
@@ -218,11 +272,13 @@ const isDescriptionValid = ref(true)
 const isPayerValid = ref(true)
 const isAmountValid = ref(true)
 const isDateValid = ref(true)
+const isParticipantValid = ref(false)
 
 const getSuggestedEmails = async () => {
   try {
     const response = await axiosInstance.get('/getSuggestedEmails')
     suggestedEmails.value = response.data
+    console.log(response.data)
   } catch (error) {
     console.error('Error fetching suggested emails:', error)
   }
@@ -288,28 +344,28 @@ async function saveExpense() {
         date: formData.value.date
       }
 
-      let totalShare = 0;
+      let totalShare = 0
 
       // Calculate the total share
       postData.participants.forEach((participant) => {
-        totalShare += participant.share;
-      });
+        totalShare += participant.share
+      })
 
       if (totalShare === postData.amount || totalShare < postData.amount) {
-        const response = await axiosInstance.post('/addTransaction', postData);
-        console.log('Response:', response.data);
+        const response = await axiosInstance.post('/addTransaction', postData)
+        console.log('Response:', response.data)
 
-        toast.success('Transaction updated:', response.data);
+        toast.success('Transaction updated:', response.data)
 
-        clearFormData();
-        router.push('/Mysplits');
+        clearFormData()
+        router.push('/Mysplits')
       } else {
-        toast.error('Please enter a valid share. Your share is more than the total amount:', totalShare)
+        toast.error('Please enter a valid share. Your share is more than the total amount')
       }
     } catch (error) {
       // Handle errors and display a toast message
-      console.error('Error updating transaction:', error);
-      toast.error('Error updating transaction');
+      console.error('Error updating transaction:', error)
+      toast.error('Error updating transaction')
     }
   }
 }
@@ -334,7 +390,7 @@ const clearFormData = () => {
 }
 
 onMounted(() => {
-  getSuggestedEmails();
+  getSuggestedEmails()
 })
 </script>
 
@@ -379,6 +435,11 @@ onMounted(() => {
   margin-bottom: 1.5rem;
 }
 
+.payer-div {
+  border-width: 2px;
+  padding: 10px;
+  border-radius: 10px;
+}
 .custom-card-body .btn-primary {
   margin-top: 1rem;
 }
@@ -437,5 +498,21 @@ onMounted(() => {
   cursor: pointer;
   font-size: 14px;
 }
+.input-error {
+  border: 1px solid #ff0000; /* Red border color */
+}
 
+.input-valid {
+  border: 1px solid #2ecc71; /* Green border color */
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+}
 </style>

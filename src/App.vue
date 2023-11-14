@@ -1,12 +1,14 @@
 <template>
   <div>
-    <navBar />
+    <MainNavBar />
+    <SecondNav />
     <router-view />
   </div>
 </template>
 
 <script setup lang="ts">
-import navBar from './components/navBar.vue'
+import MainNavBar from './components/MainNavBar.vue'
+import SecondNav from './components/SecondNav.vue'
 </script>
 
 <style scoped></style>

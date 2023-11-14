@@ -7,8 +7,9 @@
         <h5 class="text-center subtitle h-color">"I'm here to remind you to share"</h5>
       </div>
       <div class="text-center">
-        <p class="paragraph text-center mt-5 h-color">For more details, please login
-          <i class="bi icon bi-arrow-up-right-square-fill ms-2 icon-transition"></i>
+        <p class="paragraph text-center mt-5 h-color">
+          For more details, please login
+          <i class="bi icon bi-arrow-up-right-square-fill ms-2 icon-transition" @click="login"></i>
         </p>
       </div>
     </div>
@@ -25,8 +26,13 @@
 <script setup lang="ts">
 import { useAuth0 } from '@auth0/auth0-vue'
 import { reactive } from 'vue'
+import router from '../router'
 
 const { user, isAuthenticated, loginWithRedirect, logout } = useAuth0()
+const login = () => {
+  loginWithRedirect()
+  router.push("/Mysplits")
+}
 </script>
 
 <style scoped>
