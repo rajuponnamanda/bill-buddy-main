@@ -1,4 +1,4 @@
-<!-- ChatBot.vue -->
+<!-- ChatBot.vue
 <template>
     <div>
       <div v-for="message in messages" :key="message.id" class="message" :class="{ 'user-message': message.type === 'user', 'bot-message': message.type === 'bot' }">
@@ -17,24 +17,19 @@
     name: 'ChatBot',
     setup() {
       const messages = ref([]);
-      const newMessage = ref('');
   
       const sendMessage = () => {
         if (newMessage.trim() === '') return;
   
-        // Add the user's message to the chat
         messages.push({ text: newMessage, id: messages.length, type: 'user' });
         newMessage.value = '';
   
-        // Simulate the bot's response (replace this with actual logic)
         const botResponse = getBotResponse(newMessage);
   
-        // Add the bot's response to the chat
         messages.push({ text: botResponse, id: messages.length, type: 'bot' });
       };
   
       const getBotResponse = (userMessage) => {
-        // Replace this with actual bot logic or API call
         return `Bot: I received your message: "${userMessage}"`;
       };
   
@@ -64,4 +59,17 @@
     background-color: #e0e0e0;
   }
   </style>
-  
+   -->
+   <template>
+    <div>
+   
+    </div>
+   </template>
+   
+   <script setup lang="ts">
+   
+   </script>
+   
+   <style scoped>
+   
+   </style>
